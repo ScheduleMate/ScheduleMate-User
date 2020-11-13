@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "166805626886",
+    "firebase_url": "https://schedulemate-70bd5.firebaseio.com",
+    "project_id": "schedulemate-70bd5",
+    "storage_bucket": "schedulemate-70bd5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:166805626886:android:666bef18169bffab77e387",
+        "android_client_info": {
+          "package_name": "com.schedulemate.schedulemate_user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "166805626886-bcrj9m3q5kms2vas4295nj4fgqjc0gi8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3Tcoew-lvwv1fHpLNFds69kUoX33ZJSc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "166805626886-bcrj9m3q5kms2vas4295nj4fgqjc0gi8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
