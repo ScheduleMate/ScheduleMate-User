@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FF0000</color>
     <color name="main">#6298FF</color>
+    <color name="mainVariant">#4972BF</color>
     <color name="grayIcon">#A6A6A6</color>
     <color name="iconBackground">#EDEDED</color>
     <color name="hint">#5E5E5E</color>

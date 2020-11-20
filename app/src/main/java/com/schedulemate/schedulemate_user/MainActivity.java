@@ -22,11 +22,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         TextView signUpLink = findViewById(R.id.textViewLinkSignUp);
 
@@ -124,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     public void updateUI(FirebaseUser account){
         if(account != null){
             Toast.makeText(this,"로그인되었습니다.",Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, TimetableActivity.class));
+            startActivity(new Intent(this, NavigationActivity.class));
             this.finish();
 
         }else {
