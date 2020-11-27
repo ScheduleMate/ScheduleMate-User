@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.widget.Button;
@@ -18,9 +19,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.schedulemate.schedulemate_user.ui.SharedViewModel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -34,11 +38,19 @@ public class NavigationActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
+    //private SharedViewModel sharedViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
+
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance();
+        currentUser = auth.getCurrentUser();
+
+        //sharedViewModel = new ViewModelProvider(this, new SharedViewModelFactory(currentUser.getUid())).get(SharedViewModel.class);
+        Log.d("lifeCycle", "NavigationActivity create");
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -46,10 +58,6 @@ public class NavigationActivity extends AppCompatActivity {
 
         Context context = this;
         Activity activity = this;
-
-        // Initialize Firebase Auth
-        auth = FirebaseAuth.getInstance();
-       currentUser = auth.getCurrentUser();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference userRef = database.getReference("user").child(currentUser.getUid());
@@ -61,6 +69,12 @@ public class NavigationActivity extends AppCompatActivity {
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+
+        Bundle bundle  = new Bundle();
+        bundle.putString("semester", "2020-2"); //TODO: 학기 선택 자동화
+        //bundle.putString("university", "한성대학교");
+        navController.setGraph(R.navigation.mobile_navigation, bundle);
+
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
@@ -126,3 +140,22 @@ public class NavigationActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 }
+
+/*class SharedViewModelFactory implements ViewModelProvider.Factory {
+    private String uid;
+
+    public SharedViewModelFactory(String uid) {
+        this.uid = uid;
+    }
+
+    @NonNull
+    @Override
+    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+        if(modelClass.isAssignableFrom(SharedViewModel.class)){
+            return (T)(new SharedViewModel(uid));
+        }
+        else{
+            throw new IllegalArgumentException();
+        }
+    }
+}*/

@@ -69,7 +69,7 @@ public class SignUpActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 univList.clear();
                 for(DataSnapshot child : snapshot.getChildren()){
-                    univList.add(child.getKey());
+                    univList.add(child.getValue().toString());
                 }
                 univAdapter.notifyDataSetChanged();
             }
@@ -84,7 +84,7 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String univ = univList.get(position);
-                DatabaseReference univRef = ref.child(univ).child("major");
+                DatabaseReference univRef = database.getReference(univ).child("info").child("major");
                 univRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -186,9 +186,8 @@ public class SignUpActivity extends AppCompatActivity {
                                         DatabaseReference userRef = database.getReference("user").child(user.getUid());
                                         userRef.child("name").setValue(editTextName.getText().toString());
                                         userRef.child("nickName").setValue(editTextNickName.getText().toString());
-                                        userRef.child("university").setValue(univList.get(univSpinner.getSelectedItemPosition()));
                                         userRef.child("major").setValue(majorList.get(majorSpinner.getSelectedItemPosition()));
-
+                                        userRef.child("university").setValue(univList.get(univSpinner.getSelectedItemPosition()));
                                         updateUI(user);
                                     } else {
                                         // If sign in fails, display a message to the user.

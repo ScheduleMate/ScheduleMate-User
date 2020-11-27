@@ -3,23 +3,112 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_calendar">
+    app:startDestination="@id/nav_timetable">
 
     <fragment
         android:id="@+id/nav_calendar"
         android:name="com.schedulemate.schedulemate_user.ui.calendar.CalendarFragment"
         android:label="@string/menu_calendar"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_calendar" >
+        <action
+            android:id="@+id/action_nav_calendar_to_scheduleFragment"
+            app:destination="@id/scheduleFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_timetable"
-        android:name="com.schedulemate.schedulemate_user.ui.Timetable.TimetableFragment"
+        android:name="com.schedulemate.schedulemate_user.ui.timetable.TimetableFragment"
         android:label="@string/menu_timetable"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_timetable" >
+        <action
+            android:id="@+id/action_nav_timetable_to_subjectListFragment"
+            app:destination="@id/subjectListFragment" />
+        <action
+            android:id="@+id/action_nav_timetable_to_timetableListFragment"
+            app:destination="@id/timetableListFragment" />
+        <argument
+            android:name="semester"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null" />
+        <action
+            android:id="@+id/action_nav_timetable_to_registerSubjectFragment"
+            app:destination="@id/registerSubjectFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_community"
-        android:name="com.schedulemate.schedulemate_user.ui.slideshow.SlideshowFragment"
+        android:name="com.schedulemate.schedulemate_user.ui.community.CommunityFragment"
         android:label="@string/menu_community"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_community" />
+    <fragment
+        android:id="@+id/subjectListFragment"
+        android:name="com.schedulemate.schedulemate_user.ui.timetable.subjectList.SubjectListFragment"
+        android:label="시간표 목록"
+        tools:layout="@layout/fragment_subject_list_list" >
+        <action
+            android:id="@+id/action_subjectListFragment_to_classDetailFragment"
+            app:destination="@id/classDetailFragment">
+            <argument
+                android:name="subjectInfo"
+                app:argType="com.schedulemate.schedulemate_user.ui.timetable.subjectList.Subject$SubjectItem" />
+            <argument
+                android:name="className"
+                app:argType="string" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/classDetailFragment"
+        android:name="com.schedulemate.schedulemate_user.ui.timetable.classDetail.ClassDetailFragment"
+        android:label="분반 정보"
+        tools:layout="@layout/fragment_class_detail" >
+        <argument
+            android:name="subjectInfo"
+            app:argType="com.schedulemate.schedulemate_user.ui.timetable.subjectList.Subject$SubjectItem" />
+        <argument
+            android:name="className"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_classDetailFragment_to_nav_timetable"
+            app:destination="@id/nav_timetable"
+            app:popUpTo="@id/nav_timetable"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/timetableListFragment"
+        android:name="com.schedulemate.schedulemate_user.ui.timetable.timetableList.TimetableListFragment"
+        android:label="시간표 목록"
+        tools:layout="@layout/fragment_timetable_list_list" >
+        <action
+            android:id="@+id/action_timetableListFragment_to_nav_timetable"
+            app:destination="@id/nav_timetable"
+            app:popUpTo="@id/nav_timetable"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/registerSubjectFragment"
+        android:name="com.schedulemate.schedulemate_user.ui.timetable.registerSubject.registerSubjectFragment"
+        android:label="시간표 등록"
+        tools:layout="@layout/fragment_register_subject" >
+        <action
+            android:id="@+id/action_registerSubjectFragment_to_nav_timetable"
+            app:destination="@id/nav_timetable" />
+    </fragment>
+    <fragment
+        android:id="@+id/scheduleFragment"
+        android:name="com.schedulemate.schedulemate_user.ui.calendar.scheduleDetail.ScheduleFragment"
+        android:label="일정 상세"
+        tools:layout="@layout/fragment_schedule" >
+        <argument
+            android:name="date"
+            app:argType="string" />
+        <argument
+            android:name="schedule"
+            app:argType="com.schedulemate.schedulemate_user.ui.calendar.Schedule"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_scheduleFragment_to_nav_calendar"
+            app:destination="@id/nav_calendar" />
+    </fragment>
 </navigation>
