@@ -25,9 +25,12 @@ public class CommunityViewModel extends ViewModel {
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private MutableLiveData<HashMap> boardMap = new MutableLiveData<>();
     private HashMap<String, String> boardTitles = new HashMap<>();
+
     private MutableLiveData<String> classId = new MutableLiveData<>();
+
     private MutableLiveData<List<Post>> postList = new MutableLiveData<>();
     private ArrayList<Post> posts = new ArrayList<>();
+
     private MutableLiveData<List<Comment>> commentList = new MutableLiveData<>();
     private ArrayList<Comment> comments = new ArrayList<>();
 
@@ -43,19 +46,21 @@ public class CommunityViewModel extends ViewModel {
         FirebaseDatabase.getInstance().getReference(university).child("timetable").child(user.getUid()).child(semester).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                FirebaseDatabase.getInstance().getReference(university).child(semester).child("classInfo").child(snapshot.getValue(String.class)).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        boardTitles.put(snapshot.getKey(), snapshot.child("title").getValue(String.class));
-                        boardMap.setValue(boardTitles);
-                        if(classId.getValue() == null) setClassId(snapshot.getKey());
-                    }
+                if(!snapshot.hasChild("title")) {
+                    FirebaseDatabase.getInstance().getReference(university).child(semester).child("classInfo").child(snapshot.getValue(String.class)).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            boardTitles.put(snapshot.getKey(), snapshot.child("title").getValue(String.class));
+                            boardMap.setValue(boardTitles);
+                            if (classId.getValue() == null) setClassId(snapshot.getKey());
+                        }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
 
-                    }
-                });
+                        }
+                    });
+                }
             }
 
             @Override
