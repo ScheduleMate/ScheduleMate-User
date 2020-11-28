@@ -2,24 +2,33 @@ package com.schedulemate.schedulemate_user.ui.timetable;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.gridlayout.widget.GridLayout;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.schedulemate.schedulemate_user.R;
 import com.schedulemate.schedulemate_user.ui.SharedViewModel;
+import com.schedulemate.schedulemate_user.ui.timetable.classDetail.ClassGroup;
+import com.schedulemate.schedulemate_user.ui.timetable.registerSubject.RegisterSubject;
+import com.schedulemate.schedulemate_user.ui.timetable.subjectList.Subject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TimetableFragment extends Fragment {
     private SharedViewModel sharedViewModel;
@@ -37,13 +46,60 @@ public class TimetableFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        String semester = (TimetableFragmentArgs.fromBundle(getArguments()).getSemester());
+        String semester = sharedViewModel.getSemester();
         if(semester != null){
             timetableViewModel.setSemester(semester);
         }
+        timetableViewModel.setSubjectList(sharedViewModel.getUniversity());
+        timetableViewModel.setClassGroupList(sharedViewModel.getUniversity());
         timetableViewModel.setTimetable(sharedViewModel.getTimetableDR());
 
         root = inflater.inflate(R.layout.fragment_timetable, container, false);
+
+        GridView gridViewTimetable = root.findViewById(R.id.gridViewTimetable);
+
+        ArrayList<TimetableCell> timetableCells = new ArrayList<>();
+        timetableViewModel.getClassGroupList().observe(getViewLifecycleOwner(), new Observer<ArrayList>() {
+            @Override
+            public void onChanged(ArrayList arrayList) {
+                for (ClassGroup cg : (ArrayList<ClassGroup>)arrayList){
+                    HashMap<String, String> userTimeTable = timetableViewModel.getUserTimetable().getValue();
+                    if(userTimeTable.containsValue(cg.getClassId())) {
+                        for(String key : userTimeTable.keySet()){
+                            if(userTimeTable.get(key).equals(cg.getClassId())){
+                                ArrayList<Subject.SubjectItem> subjectItems = timetableViewModel.getSubjectList().getValue();
+                                for(Subject.SubjectItem subjectItem : subjectItems){
+                                    if(subjectItem.id.equals(key)){
+                                        String title = cg.getSubjectTitle();
+                                        for(RegisterSubject.Time time : cg.getTimes()) {
+                                            String day = time.getDay();
+                                            String start = time.getStart();
+                                            String end = time.getEnd();
+                                            TimetableCell cell = new TimetableCell(title, day, start, end, subjectItem, cg);
+                                            timetableCells.add(cell);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        //TODO:직접추가한 부분
+                    }
+                }
+            }
+        });
+
+        ArrayList<Integer> layouts = new ArrayList<>();
+
+        for(int i = timetableViewModel.getStartTime(); i <= timetableViewModel.getEndTime(); i++){
+            layouts.add(R.layout.timetable_grid_view_item_header_layout);
+            for(int j = 0; j < 5; j++){
+                layouts.add(R.layout.timetable_grid_view_item_layout);
+            }
+        }
+        TimetableGridAdapter adapter = new TimetableGridAdapter(getContext(), layouts, timetableCells, timetableViewModel.getStartTime());
+        gridViewTimetable.setAdapter(adapter);
 
         setHasOptionsMenu(true);
 

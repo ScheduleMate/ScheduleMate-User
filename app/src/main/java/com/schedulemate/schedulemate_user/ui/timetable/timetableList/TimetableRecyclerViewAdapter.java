@@ -52,9 +52,7 @@ public class TimetableRecyclerViewAdapter extends RecyclerView.Adapter<Timetable
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    TimetableListFragmentDirections.ActionTimetableListFragmentToNavTimetable action = TimetableListFragmentDirections.actionTimetableListFragmentToNavTimetable();
-                    action.setSemester(item);
-                    Navigation.findNavController(view).navigate(action);
+                    Navigation.findNavController(view).navigate(R.id.action_timetableListFragment_to_nav_timetable);
                 }
             });
         }

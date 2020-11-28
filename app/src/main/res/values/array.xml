@@ -7,4 +7,10 @@
         <item>목</item>
         <item>금</item>
     </string-array>
+
+    <string-array name="classScheduleType">
+        <item>중간고사</item>
+        <item>기말고사</item>
+        <item>과제</item>
+    </string-array>
 </resources>

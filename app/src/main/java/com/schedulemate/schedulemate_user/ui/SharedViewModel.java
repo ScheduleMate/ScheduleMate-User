@@ -21,34 +21,27 @@ import com.schedulemate.schedulemate_user.NavigationActivity;
 import java.util.ArrayList;
 
 public class SharedViewModel extends ViewModel {
-    private final String userId;
-    private String university = "한성대학교"; //TODO: 학교 선택 자동화
-    private String semester = "2020-2"; //TODO: 현재 학기 자동화
+    private User user;
+    private String semester;
     private final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     private MutableLiveData<ArrayList> semesterList = new MutableLiveData<>();
     private ArrayList<String> semesters = new ArrayList<>();
 
-    public SharedViewModel() {
-        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        database.getReference("user").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                university = snapshot.child("university").getValue().toString();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
+    public SharedViewModel(User user, String semester) {
+        this.user = user;
+        this.semester = semester;
         semesterList.setValue(semesters);
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 
     public void setSemesterList(DatabaseReference dr){
         semesters.clear();
-        dr.addChildEventListener(new ChildEventListener() {
+        semesterList.setValue(semesters);
+        dr.orderByKey().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 semesters.add(snapshot.getKey());
@@ -78,36 +71,42 @@ public class SharedViewModel extends ViewModel {
     }
 
     public String getUserId(){
-        return userId;
+        return user.getId();
+    }
+
+    public String getUserNickName(){
+        return user.getNickName();
     }
 
     public String getUniversity() {
-        return university;
+        return user.getUniversity();
+    }
+
+    public String getSemester() {
+        return semester;
     }
 
     public LiveData<ArrayList> getSemesterList(){
         return semesterList;
     }
-    
-    //TODO:동기화
 
-    public DatabaseReference getUserInfo(){
-        return database.getReference("user").child(userId);
+    public DatabaseReference getUserInfoDR(){
+        return database.getReference("user").child(user.getId());
     }
 
     public DatabaseReference getSemesterDR(){
-        return database.getReference(university).child(semester);
+        return database.getReference(user.getUniversity()).child(semester);
     }
 
     public DatabaseReference getSemesterInfoDR(){
-        return database.getReference(university).child("info").child("semester");
+        return database.getReference(user.getUniversity()).child("info").child("semester");
     }
 
     public DatabaseReference getTimetableDR(){
-        return database.getReference(university).child("timetable").child(userId);
+        return database.getReference(user.getUniversity()).child("timetable").child(user.getId());
     }
 
     public DatabaseReference getCalendarDR(){
-        return database.getReference("calendar").child(userId);
+        return database.getReference("calendar").child(user.getId());
     }
 }

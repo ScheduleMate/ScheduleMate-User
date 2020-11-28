@@ -56,7 +56,6 @@ public class SubjectListFragment extends Fragment {
 
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         timetableViewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
-        timetableViewModel.setSubjectList(sharedViewModel.getUniversity(), "2020-2");
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);

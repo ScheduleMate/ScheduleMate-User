@@ -25,14 +25,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.schedulemate.schedulemate_user.R;
 import com.schedulemate.schedulemate_user.ui.SharedViewModel;
+import com.schedulemate.schedulemate_user.ui.timetable.TimetableViewModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class registerSubjectFragment extends Fragment {
+public class RegisterSubjectFragment extends Fragment {
     private TableLayout tableLayoutTime;
     private SharedViewModel sharedViewModel;
+    private TimetableViewModel timetableViewModel;
     private View view;
 
     @Override
@@ -45,6 +47,7 @@ public class registerSubjectFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_register_subject, container, false);
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        timetableViewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
 
         Spinner spinnerDay = view.findViewById(R.id.spinnerDay);
         TextView textViewStart = view.findViewById(R.id.textViewStart);
@@ -192,7 +195,7 @@ public class registerSubjectFragment extends Fragment {
             EditText editTextProfessor = view.findViewById(R.id.editTextProfessor);
 
             if(editTextTitle.getText().toString().trim() != ""){
-                DatabaseReference dr = sharedViewModel.getTimetableDR().push();
+                DatabaseReference dr = sharedViewModel.getTimetableDR().child(timetableViewModel.getSemester()).push();
                 dr.child("title").setValue(editTextTitle.getText().toString());
                 dr.child("professor").setValue(editTextProfessor.getText().toString());
                 ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();

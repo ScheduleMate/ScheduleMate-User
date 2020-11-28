@@ -22,8 +22,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.schedulemate.schedulemate_user.ui.User;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,10 +122,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUI(FirebaseUser account){
+        Context context = this;
+        Activity activity = this;
         if(account != null){
             Toast.makeText(this,"로그인되었습니다.",Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, NavigationActivity.class));
-            this.finish();
+
+            FirebaseDatabase.getInstance().getReference("user").child(account.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    User user = new User(snapshot.getKey(), snapshot.child("name").getValue(String.class), snapshot.child("nickName").getValue(String.class),
+                            snapshot.child("major").getValue(String.class), snapshot.child("university").getValue(String.class));
+
+                    FirebaseDatabase.getInstance().getReference(user.getUniversity()).child("info").child("semester").orderByKey().addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            Date todayDate = new Date(System.currentTimeMillis());
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                            String today = simpleDateFormat.format(todayDate);
+
+                            String semester = null;
+
+                            for(DataSnapshot child : snapshot.getChildren()){
+                                if(child.child("start").getValue(String.class).compareTo(today) < 0 && child.child("end").getValue(String.class).compareTo(today) > 0){
+                                    semester = child.getKey();
+                                    break;
+                                }
+                            }
+                            if(semester == null){
+                                semester = snapshot.getChildren().iterator().next().getKey();
+                            }
+
+                            Intent intent = new Intent(context, NavigationActivity.class);
+                            intent.putExtra("user", user);
+                            intent.putExtra("semester", semester);
+                            startActivity(intent);
+                            activity.finish();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
 
         }else {
             Toast.makeText(this,"로그인에 실패하였습니다.",Toast.LENGTH_SHORT).show();

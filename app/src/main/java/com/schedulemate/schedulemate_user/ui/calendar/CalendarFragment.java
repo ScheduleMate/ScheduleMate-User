@@ -22,6 +22,7 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.schedulemate.schedulemate_user.R;
+import com.schedulemate.schedulemate_user.ui.SharedViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,12 +31,14 @@ import java.util.HashMap;
 public class CalendarFragment extends Fragment {
     private CalendarDecorator.Schedule scheduleDecorator;
     private CalendarViewModel calendarViewModel;
+    private SharedViewModel sharedViewModel;
     private ArrayList<Schedule> schedules;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         calendarViewModel =
                 new ViewModelProvider(this).get(CalendarViewModel.class);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         View root = inflater.inflate(R.layout.fragment_calendar, container, false);
 
         MaterialCalendarView calendarView = root.findViewById(R.id.calendarView);
@@ -43,7 +46,7 @@ public class CalendarFragment extends Fragment {
         ListView listViewSchedule = root.findViewById(R.id.listViewSchedule);
 
         CalendarDay today = CalendarDay.today();
-        calendarViewModel.setMonthSchedule(String.format("%04d-%02d", today.getYear(), today.getMonth() + 1));
+        calendarViewModel.setMonthSchedule(String.format("%04d-%02d", today.getYear(), today.getMonth() + 1), sharedViewModel.getUniversity());
 
         schedules = calendarViewModel.getMonthSchedule().getValue().containsKey(String.valueOf(today.getDay())) ?
                 new ArrayList<>((ArrayList<Schedule>)calendarViewModel.getMonthSchedule().getValue().get(String.valueOf(today.getDay()))) : new ArrayList<>();
