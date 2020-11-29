@@ -210,25 +210,31 @@ public class CommonScheduleFragment extends Fragment {
         ((Button) view.findViewById(R.id.buttonEdit)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar);
-                builder.setItems(R.array.classScheduleType, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                            case 1:
-                                CommonScheduleFragmentDirections.ActionCommonScheduleFragmentToEditCommonScheduleFragment action =
-                                        CommonScheduleFragmentDirections.actionCommonScheduleFragmentToEditCommonScheduleFragment(classInfo, which, subjectItem);
-                                Navigation.findNavController(view).navigate(action);
-                                break;
-                            case 2:
-                                CommonScheduleFragmentDirections.ActionCommonScheduleFragmentToAddHomeWorkFragment2 action2 =
-                                        CommonScheduleFragmentDirections.actionCommonScheduleFragmentToAddHomeWorkFragment2(subjectItem, classInfo);
-                                Navigation.findNavController(view).navigate(action2);
+                if(sharedViewModel.getUser().getDeclared() < 10) {
+                    androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar);
+                    builder.setItems(R.array.classScheduleType, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case 0:
+                                case 1:
+                                    CommonScheduleFragmentDirections.ActionCommonScheduleFragmentToEditCommonScheduleFragment action =
+                                            CommonScheduleFragmentDirections.actionCommonScheduleFragmentToEditCommonScheduleFragment(classInfo, which, subjectItem);
+                                    Navigation.findNavController(view).navigate(action);
+                                    break;
+                                case 2:
+                                    CommonScheduleFragmentDirections.ActionCommonScheduleFragmentToAddHomeWorkFragment2 action2 =
+                                            CommonScheduleFragmentDirections.actionCommonScheduleFragmentToAddHomeWorkFragment2(subjectItem, classInfo);
+                                    Navigation.findNavController(view).navigate(action2);
+                            }
                         }
-                    }
-                }).show();
-
+                    }).show();
+                }
+                else{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("경고").setMessage("신고가 10회 이상 누적되어 일정을 수정할 수 없습니다.").setPositiveButton("확인", null);
+                    builder.show();
+                }
             }
         });
 

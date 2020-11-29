@@ -188,6 +188,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         userRef.child("nickName").setValue(editTextNickName.getText().toString());
                                         userRef.child("major").setValue(majorList.get(majorSpinner.getSelectedItemPosition()));
                                         userRef.child("university").setValue(univList.get(univSpinner.getSelectedItemPosition()));
+                                        userRef.child("declared").setValue("0");
                                         updateUI(user);
                                     } else {
                                         // If sign in fails, display a message to the user.

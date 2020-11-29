@@ -1,5 +1,6 @@
 package com.schedulemate.schedulemate_user.ui.timetable.classDetail;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -29,6 +30,7 @@ import com.schedulemate.schedulemate_user.ui.timetable.subjectList.Subject;
 public class ClassDetailFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private TimetableViewModel timetableViewModel;
+    private Context context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,7 @@ public class ClassDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_class_detail, container, false);
+        context = getContext();
 
         Subject.SubjectItem subjectItem = ClassDetailFragmentArgs.fromBundle(getArguments()).getSubjectInfo();
         String className = ClassDetailFragmentArgs.fromBundle(getArguments()).getClassName();
@@ -72,9 +75,9 @@ public class ClassDetailFragment extends Fragment {
                        textViewProfessor.setText(snapshot.child("professor").getValue().toString());
                        textViewType.setText(snapshot.child("type").getValue().toString());
                        for(DataSnapshot time : snapshot.child("time").getChildren()){
-                           TableRow row = new TableRow(getContext());
+                           TableRow row = new TableRow(context);
 
-                           TextView textViewTime = new TextView(getContext());
+                           TextView textViewTime = new TextView(context);
                            TableRow.LayoutParams params1 = new TableRow.LayoutParams();
                            params1.weight = 2;
                            textViewTime.setLayoutParams(params1);

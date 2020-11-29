@@ -113,13 +113,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
+    /*@Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = auth.getCurrentUser();
+
         updateUI(currentUser);
-    }
+    }*/
 
     public void updateUI(FirebaseUser account){
         Context context = this;
@@ -131,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     User user = new User(snapshot.getKey(), snapshot.child("name").getValue(String.class), snapshot.child("nickName").getValue(String.class),
-                            snapshot.child("major").getValue(String.class), snapshot.child("university").getValue(String.class));
+                            snapshot.child("major").getValue(String.class), snapshot.child("university").getValue(String.class), Integer.parseInt(snapshot.child("declared").getValue(String.class)));
 
                     FirebaseDatabase.getInstance().getReference(user.getUniversity()).child("info").child("semester").orderByKey().addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override

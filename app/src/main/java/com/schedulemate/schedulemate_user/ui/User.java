@@ -8,13 +8,15 @@ public class User implements Serializable {
     private String nickName;
     private String major;
     private String university;
+    private int declared;
 
-    public User(String id, String name, String nickName, String major, String university) {
+    public User(String id, String name, String nickName, String major, String university, int declared) {
         this.id = id;
         this.name = name;
         this.nickName = nickName;
         this.major = major;
         this.university = university;
+        this.declared = declared;
     }
 
     public String getId() {
@@ -35,5 +37,9 @@ public class User implements Serializable {
 
     public String getUniversity() {
         return university;
+    }
+
+    public int getDeclared() {
+        return declared;
     }
 }

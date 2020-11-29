@@ -70,10 +70,15 @@ public class EditCommonScheduleFragment extends Fragment {
         textViewDateStart.setOnClickListener(onClickListener);
         textViewDateEnd.setOnClickListener(onClickListener);
 
-        if(classInfo.getMidExam() != null){
+        if( type == 0 && classInfo.getMidExam() != null){
             textViewDateStart.setText(classInfo.getMidExam().getStartTime());
             textViewDateEnd.setText(classInfo.getMidExam().getEndTime());
             editTextPlace.setText(classInfo.getMidExam().getPlace());
+        }
+        else if( type == 1 && classInfo.getFinalExam() != null){
+            textViewDateStart.setText(classInfo.getFinalExam().getStartTime());
+            textViewDateEnd.setText(classInfo.getFinalExam().getEndTime());
+            editTextPlace.setText(classInfo.getFinalExam().getPlace());
         }
         else {
             textViewDateStart.setText((new SimpleDateFormat("yyyy년 MM월 dd일 HH:mm").format(now)));
