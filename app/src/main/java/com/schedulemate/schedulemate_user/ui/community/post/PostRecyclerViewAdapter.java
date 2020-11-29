@@ -1,33 +1,46 @@
 package com.schedulemate.schedulemate_user.ui.community.post;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.schedulemate.schedulemate_user.R;
+import com.schedulemate.schedulemate_user.ui.User;
 import com.schedulemate.schedulemate_user.ui.community.Comment;
 
+import java.util.HashMap;
 import java.util.List;
 
 class PostRecyclerViewAdapter extends RecyclerView.Adapter<PostRecyclerViewAdapter.ViewHolder> {
     private List<Comment> items;
+    private String subjectId;
     private String classId;
     private String postId;
+    private Context context;
+    private User user;
 
-    public PostRecyclerViewAdapter(List<Comment> items, String classId, String postId) {
+    public PostRecyclerViewAdapter(List<Comment> items, String classId, String postId, Context context, User user, String subjectId) {
         this.items = items;
+        this.subjectId = subjectId;
         this.classId = classId;
         this.postId = postId;
+        this.context = context;
+        this.user = user;
     }
 
     public void setItems(List<Comment> items) {
@@ -71,6 +84,38 @@ class PostRecyclerViewAdapter extends RecyclerView.Adapter<PostRecyclerViewAdapt
         else{
             imageButtonDelete.setVisibility(View.GONE);
         }
+
+        ((ImageButton)holder.view.findViewById(R.id.imageButtonCommentReport)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View view = ((LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.report_dialog_layout, null);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("댓글 신고").setMessage("이 댓글을 신고하시겠습니까?").setView(view).setPositiveButton("신고", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        HashMap<String, String> info = new HashMap<>();
+                        //info.put("class", className);
+                        info.put("classKey", classId);
+                        info.put("classTitle", subjectId);
+                        info.put("communityKey", postId);
+                        info.put("reason", ((EditText)view.findViewById(R.id.editTextReport)).getText().toString());
+                        info.put("time", items.get(position).getTime());
+                        info.put("writer", items.get(position).getWriter());
+                        info.put("writerNickName", items.get(position).getWriterNickName());
+
+                        FirebaseDatabase.getInstance().getReference(user.getUniversity()).child("declare").child("comment").child(items.get(position).getId()).setValue(info, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                                AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+                                builder1.setMessage("신고 완료되었습니다.").setPositiveButton("확인", null);
+                                builder1.show();
+                            }
+                        });
+                    }
+                }).setNegativeButton("취소", null);
+                builder.show();
+            }
+        });
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.schedulemate.schedulemate_user.ui.timetable;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +22,10 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.schedulemate.schedulemate_user.R;
 import com.schedulemate.schedulemate_user.ui.SharedViewModel;
 import com.schedulemate.schedulemate_user.ui.timetable.classDetail.ClassGroup;
@@ -29,6 +34,8 @@ import com.schedulemate.schedulemate_user.ui.timetable.subjectList.Subject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TimetableFragment extends Fragment {
     private SharedViewModel sharedViewModel;
@@ -48,7 +55,7 @@ public class TimetableFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         String semester = sharedViewModel.getSemester();
         if(semester != null){
-            timetableViewModel.setSemester(semester);
+            timetableViewModel.setSemester(semester, sharedViewModel.getTimetableDR());
         }
         timetableViewModel.setSubjectList(sharedViewModel.getUniversity());
         timetableViewModel.setClassGroupList(sharedViewModel.getUniversity());
@@ -59,36 +66,6 @@ public class TimetableFragment extends Fragment {
         GridView gridViewTimetable = root.findViewById(R.id.gridViewTimetable);
 
         ArrayList<TimetableCell> timetableCells = new ArrayList<>();
-        timetableViewModel.getClassGroupList().observe(getViewLifecycleOwner(), new Observer<ArrayList>() {
-            @Override
-            public void onChanged(ArrayList arrayList) {
-                for (ClassGroup cg : (ArrayList<ClassGroup>)arrayList){
-                    HashMap<String, String> userTimeTable = timetableViewModel.getUserTimetable().getValue();
-                    if(userTimeTable.containsValue(cg.getClassId())) {
-                        for(String key : userTimeTable.keySet()){
-                            if(userTimeTable.get(key).equals(cg.getClassId())){
-                                ArrayList<Subject.SubjectItem> subjectItems = timetableViewModel.getSubjectList().getValue();
-                                for(Subject.SubjectItem subjectItem : subjectItems){
-                                    if(subjectItem.id.equals(key)){
-                                        String title = cg.getSubjectTitle();
-                                        for(RegisterSubject.Time time : cg.getTimes()) {
-                                            String day = time.getDay();
-                                            String start = time.getStart();
-                                            String end = time.getEnd();
-                                            TimetableCell cell = new TimetableCell(title, day, start, end, subjectItem, cg);
-                                            timetableCells.add(cell);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else{
-                        //TODO:직접추가한 부분
-                    }
-                }
-            }
-        });
 
         ArrayList<Integer> layouts = new ArrayList<>();
 
@@ -98,8 +75,88 @@ public class TimetableFragment extends Fragment {
                 layouts.add(R.layout.timetable_grid_view_item_layout);
             }
         }
-        TimetableGridAdapter adapter = new TimetableGridAdapter(getContext(), layouts, timetableCells, timetableViewModel.getStartTime());
+        TimetableGridAdapter adapter = new TimetableGridAdapter(getContext(), layouts, timetableCells, timetableViewModel.getStartTime(), root);
         gridViewTimetable.setAdapter(adapter);
+
+        Pattern pattern = Pattern.compile("([0-9]{2}):([0-9]{2})");
+
+        timetableViewModel.getUserTimetable().observe(getViewLifecycleOwner(), new Observer<HashMap>() {
+            @Override
+            public void onChanged(HashMap hashMap) {
+                timetableCells.clear();
+                ArrayList<Subject.SubjectItem> subjectItems = timetableViewModel.getSubjectList().getValue();
+                ArrayList<ClassGroup> classGroups = timetableViewModel.getClassGroupList().getValue();
+
+                for(String key : ((HashMap<String, String>)hashMap).keySet()){
+                    if (!hashMap.get(key).equals("registered")) {
+                        Subject.SubjectItem subjectItem = null;
+
+                        for (Subject.SubjectItem s : subjectItems) {
+
+                            if (s.id.equals(key)) {
+                                Log.d("checkUserTimetableInSubject", s.id);
+                                subjectItem = s;
+
+                                ClassGroup classGroup;
+                                for (ClassGroup c : classGroups) {
+                                    Log.d("checkUserTimetableInClass", c.getClassId());
+                                    if (c.getClassId().equals(hashMap.get(key))) {
+
+                                        classGroup = c;
+
+                                        String title = subjectItem.title;
+                                        for (RegisterSubject.Time time : classGroup.getTimes()) {
+                                            String day = time.getDay();
+                                            String start = time.getStart();
+                                            String end = time.getEnd();
+
+                                            Matcher matcherStart = pattern.matcher(start);
+                                            Matcher matcherEnd = pattern.matcher(end);
+
+                                            if (matcherStart.find() && timetableViewModel.getStartTime() > Integer.parseInt(matcherStart.group(1)))
+                                                timetableViewModel.setTimetableStart(Integer.parseInt(matcherStart.group(1)));
+
+                                            if (matcherEnd.find() && timetableViewModel.getEndTime() < Integer.parseInt(matcherEnd.group(1)))
+                                                timetableViewModel.setTimetableEnd(Integer.parseInt(matcherStart.group(1)));
+
+                                            timetableCells.add(new TimetableCell(title, day, start, end, subjectItem, classGroup, null));
+                                        }
+
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    else{
+                        HashMap<String, RegisterSubject> registerSubjects = timetableViewModel.getRegisteredTimetable().getValue();
+
+                        RegisterSubject registerSubject = registerSubjects.get(key);
+
+                        String title = registerSubject.getTitle();
+                        for (RegisterSubject.Time time : registerSubject.getTimes()) {
+                            String day = time.getDay();
+                            String start = time.getStart();
+                            String end = time.getEnd();
+
+                            Matcher matcherStart = pattern.matcher(start);
+                            Matcher matcherEnd = pattern.matcher(end);
+
+                            if (matcherStart.find() && timetableViewModel.getStartTime() > Integer.parseInt(matcherStart.group(1)))
+                                timetableViewModel.setTimetableStart(Integer.parseInt(matcherStart.group(1)));
+
+                            if (matcherEnd.find() && timetableViewModel.getEndTime() < Integer.parseInt(matcherEnd.group(1)))
+                                timetableViewModel.setTimetableEnd(Integer.parseInt(matcherStart.group(1)));
+
+                            timetableCells.add(new TimetableCell(title, day, start, end, null, null, registerSubject));
+                        }
+                    }
+
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
 
         setHasOptionsMenu(true);
 

@@ -86,9 +86,7 @@
         tools:layout="@layout/fragment_timetable_list_list" >
         <action
             android:id="@+id/action_timetableListFragment_to_nav_timetable"
-            app:destination="@id/nav_timetable"
-            app:popUpTo="@id/nav_timetable"
-            app:popUpToInclusive="true" />
+            app:destination="@id/nav_timetable" />
     </fragment>
     <fragment
         android:id="@+id/registerSubjectFragment"
@@ -100,6 +98,11 @@
             app:destination="@id/nav_timetable"
             app:popUpTo="@id/nav_timetable"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="registerSubject"
+            app:argType="com.schedulemate.schedulemate_user.ui.timetable.registerSubject.RegisterSubject"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <fragment
         android:id="@+id/scheduleFragment"
@@ -138,6 +141,9 @@
             app:destination="@id/postingFragment"
             app:popUpTo="@id/nav_community"
             app:popUpToInclusive="false" />
+        <argument
+            android:name="classTitle"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/postingFragment"
@@ -154,12 +160,57 @@
             app:argType="com.schedulemate.schedulemate_user.ui.community.Post"
             app:nullable="true"
             android:defaultValue="@null" />
+        <argument
+            android:name="classTitle"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/commonScheduleFragment"
         android:name="com.schedulemate.schedulemate_user.ui.timetable.commonSchedule.CommonScheduleFragment"
         android:label="과목 일정"
         tools:layout="@layout/fragment_common_schedule" >
+        <argument
+            android:name="subjectInfo"
+            app:argType="com.schedulemate.schedulemate_user.ui.timetable.subjectList.Subject$SubjectItem" />
+        <argument
+            android:name="classInfo"
+            app:argType="com.schedulemate.schedulemate_user.ui.timetable.classDetail.ClassGroup" />
+        <action
+            android:id="@+id/action_commonScheduleFragment_to_editCommonScheduleFragment"
+            app:destination="@id/editCommonScheduleFragment" />
+        <action
+            android:id="@+id/action_commonScheduleFragment_to_addHomeWorkFragment2"
+            app:destination="@id/addHomeWorkFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/editCommonScheduleFragment"
+        android:name="com.schedulemate.schedulemate_user.ui.timetable.editCommonSchedule.EditCommonScheduleFragment"
+        android:label="과목 일정 수정"
+        tools:layout="@layout/fragment_edit_common_schedule" >
+        <argument
+            android:name="classInfo"
+            app:argType="com.schedulemate.schedulemate_user.ui.timetable.classDetail.ClassGroup" />
+        <argument
+            android:name="type"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_editCommonScheduleFragment_to_commonScheduleFragment"
+            app:destination="@id/commonScheduleFragment"
+            app:popUpTo="@id/commonScheduleFragment"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="subjectInfo"
+            app:argType="com.schedulemate.schedulemate_user.ui.timetable.subjectList.Subject$SubjectItem" />
+    </fragment>
+    <fragment
+        android:id="@+id/addHomeWorkFragment2"
+        android:name="com.schedulemate.schedulemate_user.ui.timetable.editCommonSchedule.AddHomeWorkFragment"
+        android:label="AddHomeWorkFragment" >
+        <action
+            android:id="@+id/action_addHomeWorkFragment2_to_commonScheduleFragment"
+            app:destination="@id/commonScheduleFragment"
+            app:popUpTo="@id/commonScheduleFragment"
+            app:popUpToInclusive="true" />
         <argument
             android:name="subjectInfo"
             app:argType="com.schedulemate.schedulemate_user.ui.timetable.subjectList.Subject$SubjectItem" />

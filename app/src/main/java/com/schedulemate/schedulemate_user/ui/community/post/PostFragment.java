@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -29,14 +32,18 @@ import com.schedulemate.schedulemate_user.ui.SharedViewModel;
 import com.schedulemate.schedulemate_user.ui.community.Comment;
 import com.schedulemate.schedulemate_user.ui.community.CommunityViewModel;
 import com.schedulemate.schedulemate_user.ui.community.Post;
+import com.schedulemate.schedulemate_user.ui.community.posting.PostingFragmentArgs;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class PostFragment extends Fragment {
     private CommunityViewModel communityViewModel;
     private SharedViewModel sharedViewModel;
+    private Post post;
+    private String classTitle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,7 +59,11 @@ public class PostFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_post, container, false);
 
-        Post post = PostFragmentArgs.fromBundle(getArguments()).getPost();
+        setHasOptionsMenu(true);
+
+        post = PostFragmentArgs.fromBundle(getArguments()).getPost();
+        classTitle = PostingFragmentArgs.fromBundle(getArguments()).getClassTitle();
+
 
         TextView textViewPostWriter = view.findViewById(R.id.textViewPostWriter);
         TextView textViewPostTime = view.findViewById(R.id.textViewPostTime);
@@ -67,7 +78,7 @@ public class PostFragment extends Fragment {
         textViewPostContent.setText(post.getContent());
         textViewCommentCount.setText("(" + (post.getComments()).size() + ")");
 
-        PostRecyclerViewAdapter adapter = new PostRecyclerViewAdapter(post.getComments(), communityViewModel.getClassId().getValue(), post.getId());
+        PostRecyclerViewAdapter adapter = new PostRecyclerViewAdapter(post.getComments(), communityViewModel.getClassId().getValue(), post.getId(), getContext(), sharedViewModel.getUser(), classTitle);
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewComment);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
@@ -131,7 +142,7 @@ public class PostFragment extends Fragment {
             imageButtonPostEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PostFragmentDirections.ActionPostFragmentToPostingFragment action = PostFragmentDirections.actionPostFragmentToPostingFragment();
+                    PostFragmentDirections.ActionPostFragmentToPostingFragment action = PostFragmentDirections.actionPostFragmentToPostingFragment(classTitle);
                     action.setPost(post);
                     Navigation.findNavController(v).navigate(action);
                 }
@@ -143,5 +154,46 @@ public class PostFragment extends Fragment {
         }
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.post, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.report:
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                View view = getLayoutInflater().inflate(R.layout.report_dialog_layout, null);
+                builder.setTitle("게시글 신고").setMessage("이 게시글을 신고하시겠습니까?").setView(view).setPositiveButton("신고", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        HashMap<String, String> info = new HashMap<>();
+                        info.put("content", post.getContent());
+                        info.put("time", post.getTime());
+                        info.put("title", post.getTitle());
+                        info.put("title", classTitle);
+                        info.put("writer", post.getWriter());
+                        info.put("writerNickName", post.getWriterNickName());
+                        info.put("reason", ((EditText)view.findViewById(R.id.editTextReport)).getText().toString());
+                        FirebaseDatabase.getInstance().getReference(sharedViewModel.getUniversity()).child("declare").child("community")
+                                .child(communityViewModel.getClassId().getValue()).child(post.getId()).setValue(info, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                                AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
+                                builder1.setMessage("신고 완료되었습니다.").setPositiveButton("확인", null);
+                                builder1.show();
+                            }
+                        });
+                    }
+                }).setNegativeButton("취소", null);
+                builder.show();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

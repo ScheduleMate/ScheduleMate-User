@@ -21,6 +21,7 @@ import com.schedulemate.schedulemate_user.ui.timetable.subjectList.Subject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,8 +34,8 @@ public class TimetableViewModel extends ViewModel {
     private MutableLiveData<HashMap> timetable = new MutableLiveData<>();
     private HashMap<String, String> timetableSubjects = new HashMap<>();
 
-    private MutableLiveData<ArrayList> registeredTimetable = new MutableLiveData<>();
-    private ArrayList<RegisterSubject> registeredTimetableSubjects = new ArrayList<>();
+    private MutableLiveData<HashMap> registeredTimetable = new MutableLiveData<>();
+    private HashMap<String, RegisterSubject> registeredTimetableSubjects = new HashMap<>();
 
     private MutableLiveData<ArrayList> subjectList = new MutableLiveData<>();
     private ArrayList<Subject.SubjectItem> subjectItems = new ArrayList<>();
@@ -52,11 +53,12 @@ public class TimetableViewModel extends ViewModel {
         timetable.setValue(timetableSubjects);
         registeredTimetable.setValue(registeredTimetableSubjects);
         timetableStart = "09:00";
-        timetableEnd = "15:00";
+        timetableEnd = "22:00";
     }
 
-    public void setSemester(String semester){
+    public void setSemester(String semester, DatabaseReference dr){
         this.semester = semester;
+        //setTimetable(dr);
     }
 
     public void setTimetableList(DatabaseReference dr){
@@ -96,6 +98,9 @@ public class TimetableViewModel extends ViewModel {
         dr.child(semester).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String subjectId = snapshot.getKey();
+                String classId;
+
                 if(snapshot.hasChild("title")){
                     String id = snapshot.getKey();
                     String title = snapshot.child("title").getValue(String.class);
@@ -112,16 +117,16 @@ public class TimetableViewModel extends ViewModel {
                         RegisterSubject.Time time = new RegisterSubject.Time(day, start, end, place);
                         rs.addTime(time);
                     }
-                    registeredTimetableSubjects.add(rs);
+                    registeredTimetableSubjects.put(id, rs);
                     registeredTimetable.setValue(registeredTimetableSubjects);
+
+                    classId = "registered";
                 }
                 else{
-                    String subjectId = snapshot.getKey();
-                    String classId = snapshot.getValue(String.class);
-
-                    timetableSubjects.put(subjectId, classId);
-                    timetable.setValue(timetableSubjects);
+                    classId = snapshot.getValue(String.class);
                 }
+                timetableSubjects.put(subjectId, classId);
+                timetable.setValue(timetableSubjects);
             }
 
             @Override
@@ -161,6 +166,8 @@ public class TimetableViewModel extends ViewModel {
                 Subject.SubjectItem subjectItem = new Subject.SubjectItem(id, title, dependency, classification, grade, credit, classes);
                 subjectItems.add(subjectItem);
                 subjectList.setValue(subjectItems);
+
+                timetable.setValue(timetableSubjects);
             }
 
             @Override
@@ -222,6 +229,8 @@ public class TimetableViewModel extends ViewModel {
 
                             classGroup.setMidExam(new ClassGroup.Exam(startTime, endTime, place, registrant, registeredTime));
                             classGroupList.setValue(classGroups);
+
+                            timetable.setValue(timetableSubjects);
                         }
 
                         @Override
@@ -244,6 +253,8 @@ public class TimetableViewModel extends ViewModel {
 
                             classGroup.setFinalExam(new ClassGroup.Exam(startTime, endTime, place, registrant, registeredTime));
                             classGroupList.setValue(classGroups);
+
+                            timetable.setValue(timetableSubjects);
                         }
 
                         @Override
@@ -253,32 +264,22 @@ public class TimetableViewModel extends ViewModel {
                     });
                 }
 
-                if(snapshot.hasChild("schedule/homeWork")){
-                    snapshot.getRef().child("schedule").child("homeWork").addChildEventListener(new ChildEventListener() {
+                if(snapshot.hasChild("schedule/homeWork")) {
+                    snapshot.getRef().child("schedule").child("homeWork").orderByKey().addValueEventListener(new ValueEventListener() {
                         @Override
-                        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                            String timeLimit = snapshot.child("timeLimit").getValue(String.class);
-                            String content = snapshot.child("content").getValue(String.class);
-                            String registrant = snapshot.child("registrant").getValue(String.class);
-                            String registeredTime = snapshot.getKey();
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            classGroup.setHomeWorks(new ArrayList<>());
+                            for (DataSnapshot s : snapshot.getChildren()) {
+                                String timeLimit = s.child("timeLimit").getValue(String.class);
+                                String content = s.child("content").getValue(String.class);
+                                String registrant = s.child("registrant").getValue(String.class);
+                                String registeredTime = s.getKey();
 
-                            classGroup.addHomeWorks(new ClassGroup.HomeWork(timeLimit, content, registrant, registeredTime));
-                            classGroupList.setValue(classGroups);
-                        }
+                                classGroup.addHomeWorks(new ClassGroup.HomeWork(timeLimit, content, registrant, registeredTime));
+                                classGroupList.setValue(classGroups);
 
-                        @Override
-                        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                        }
-
-                        @Override
-                        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-                        }
-
-                        @Override
-                        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+                                timetable.setValue(timetableSubjects);
+                            }
                         }
 
                         @Override
@@ -289,6 +290,8 @@ public class TimetableViewModel extends ViewModel {
                 }
                 classGroups.add(classGroup);
                 classGroupList.setValue(classGroups);
+
+                timetable.setValue(timetableSubjects);
             }
 
             @Override
@@ -313,6 +316,14 @@ public class TimetableViewModel extends ViewModel {
         });
     }
 
+    public void setTimetableStart(int start) {
+        this.timetableStart = String.format("%02d:00", start);
+    }
+
+    public void setTimetableEnd(int end) {
+        this.timetableEnd = String.format("%02d:00", end);
+    }
+
     public String getSemester(){
         return semester;
     }
@@ -323,6 +334,10 @@ public class TimetableViewModel extends ViewModel {
 
     public LiveData<HashMap> getUserTimetable(){
         return timetable;
+    }
+
+    public MutableLiveData<HashMap> getRegisteredTimetable() {
+        return registeredTimetable;
     }
 
     public LiveData<ArrayList> getSubjectList() {

@@ -67,7 +67,7 @@ public class CommunityFragment extends Fragment {
 
         RecyclerView recyclerViewPost = root.findViewById(R.id.recyclerViewPost);
         recyclerViewPost.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new CommunityRecyclerViewAdapter(communityViewModel.getPostList().getValue());
+        adapter = new CommunityRecyclerViewAdapter(communityViewModel.getPostList().getValue(), textViewTitle.getText().toString());
         recyclerViewPost.setAdapter(adapter);
 
         communityViewModel.getPostList().observe(getViewLifecycleOwner(), new Observer<List<Post>>() {

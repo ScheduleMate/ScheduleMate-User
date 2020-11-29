@@ -38,6 +38,10 @@ public class ClassGroup implements Serializable {
         this.finalExam = finalExam;
     }
 
+    public void setHomeWorks(ArrayList<HomeWork> homeWorks) {
+        this.homeWorks = homeWorks;
+    }
+
     public void addHomeWorks(HomeWork homework) {
         homeWorks.add(homework);
     }

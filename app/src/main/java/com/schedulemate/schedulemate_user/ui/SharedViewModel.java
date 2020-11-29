@@ -82,6 +82,10 @@ public class SharedViewModel extends ViewModel {
         return user.getUniversity();
     }
 
+    public User getUser() {
+        return user;
+    }
+
     public String getSemester() {
         return semester;
     }

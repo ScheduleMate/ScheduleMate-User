@@ -74,7 +74,7 @@ public class TimetableListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new TimetableRecyclerViewAdapter(timetableViewModel.getTimetableList().getValue()));
+            recyclerView.setAdapter(new TimetableRecyclerViewAdapter(timetableViewModel.getTimetableList().getValue(), sharedViewModel, timetableViewModel));
             timetableViewModel.getTimetableList().observe(getViewLifecycleOwner(), new Observer<ArrayList>() {
                 @Override
                 public void onChanged(ArrayList arrayList) {

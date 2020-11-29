@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.schedulemate.schedulemate_user.R;
+import com.schedulemate.schedulemate_user.ui.SharedViewModel;
+import com.schedulemate.schedulemate_user.ui.timetable.TimetableViewModel;
 import com.schedulemate.schedulemate_user.ui.timetable.subjectList.SubjectListFragmentDirections;
 
 import java.util.List;
@@ -16,9 +18,13 @@ import java.util.List;
 public class TimetableRecyclerViewAdapter extends RecyclerView.Adapter<TimetableRecyclerViewAdapter.ViewHolder> {
 
     private final List<String> mValues;
+    private SharedViewModel sharedViewModel;
+    private TimetableViewModel timetableViewModel;
 
-    public TimetableRecyclerViewAdapter(List<String> items) {
-        mValues = items;
+    public TimetableRecyclerViewAdapter(List<String> mValues, SharedViewModel sharedViewModel, TimetableViewModel timetableViewModel) {
+        this.mValues = mValues;
+        this.sharedViewModel = sharedViewModel;
+        this.timetableViewModel = timetableViewModel;
     }
 
     @Override
@@ -32,6 +38,14 @@ public class TimetableRecyclerViewAdapter extends RecyclerView.Adapter<Timetable
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.item = mValues.get(position);
         holder.contentView.setText(mValues.get(position));
+
+        holder.view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timetableViewModel.setSemester(mValues.get(position), sharedViewModel.getTimetableDR());
+                Navigation.findNavController(holder.view).navigate(R.id.action_timetableListFragment_to_nav_timetable);
+            }
+        });
     }
 
     @Override
@@ -48,13 +62,6 @@ public class TimetableRecyclerViewAdapter extends RecyclerView.Adapter<Timetable
             super(view);
             this.view = view;
             contentView = (TextView) view.findViewById(R.id.content);
-
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Navigation.findNavController(view).navigate(R.id.action_timetableListFragment_to_nav_timetable);
-                }
-            });
         }
 
         @Override

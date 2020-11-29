@@ -30,6 +30,7 @@ import java.util.Date;
 public class PostingFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private CommunityViewModel communityViewModel;
+    private String classTitle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,7 +90,7 @@ public class PostingFragment extends Fragment {
 
                 Post post = new Post(dr.getKey(), title, content, writerNickName, writer, time, new ArrayList<>());
 
-                PostingFragmentDirections.ActionPostingFragmentToPostFragment action = PostingFragmentDirections.actionPostingFragmentToPostFragment(post);
+                PostingFragmentDirections.ActionPostingFragmentToPostFragment action = PostingFragmentDirections.actionPostingFragmentToPostFragment(post, classTitle);
                 Navigation.findNavController(v).navigate(action);
             }
         });

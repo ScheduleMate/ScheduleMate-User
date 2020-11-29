@@ -21,6 +21,7 @@ import androidx.navigation.Navigation;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.schedulemate.schedulemate_user.R;
 import com.schedulemate.schedulemate_user.ui.SharedViewModel;
 
@@ -33,6 +34,7 @@ public class CalendarFragment extends Fragment {
     private CalendarViewModel calendarViewModel;
     private SharedViewModel sharedViewModel;
     private ArrayList<Schedule> schedules;
+    private int month;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,14 +48,15 @@ public class CalendarFragment extends Fragment {
         ListView listViewSchedule = root.findViewById(R.id.listViewSchedule);
 
         CalendarDay today = CalendarDay.today();
-        calendarViewModel.setMonthSchedule(String.format("%04d-%02d", today.getYear(), today.getMonth() + 1), sharedViewModel.getUniversity());
+        month = today.getMonth();
+        calendarViewModel.setMonthSchedule(String.format("%04d-%02d", today.getYear(), today.getMonth() + 1), sharedViewModel.getUniversity(), sharedViewModel.getUserId(), sharedViewModel.getSemester());
 
         schedules = calendarViewModel.getMonthSchedule().getValue().containsKey(String.valueOf(today.getDay())) ?
                 new ArrayList<>((ArrayList<Schedule>)calendarViewModel.getMonthSchedule().getValue().get(String.valueOf(today.getDay()))) : new ArrayList<>();
         CalendarArrayAdapter adapter = new CalendarArrayAdapter(getContext(), schedules);
         listViewSchedule.setAdapter(adapter);
 
-        scheduleDecorator = new CalendarDecorator.Schedule(calendarViewModel.getMonthSchedule().getValue());
+        scheduleDecorator = new CalendarDecorator.Schedule(calendarViewModel.getMonthSchedule().getValue(), today.getMonth());
 
         calendarView.setSelectedDate(today);
         calendarView.addDecorators(
@@ -66,7 +69,7 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onChanged(HashMap hashMap) {
                 calendarView.removeDecorator(scheduleDecorator);
-                scheduleDecorator = new CalendarDecorator.Schedule(hashMap);
+                scheduleDecorator = new CalendarDecorator.Schedule(hashMap, month);
                 calendarView.addDecorator(scheduleDecorator);
                 schedules.clear();
                 if (calendarViewModel.getMonthSchedule().getValue().containsKey(String.valueOf(calendarView.getSelectedDate().getDay())))
@@ -84,6 +87,18 @@ public class CalendarFragment extends Fragment {
                 schedules.clear();
                 if (calendarViewModel.getMonthSchedule().getValue().containsKey(String.valueOf(date.getDay())))
                     schedules.addAll((ArrayList<Schedule>)calendarViewModel.getMonthSchedule().getValue().get(String.valueOf(date.getDay())));
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+        calendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
+            @Override
+            public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+                month = date.getMonth();
+                calendarViewModel.setMonthSchedule(String.format("%04d-%02d", date.getYear(), date.getMonth() + 1), sharedViewModel.getUniversity(), sharedViewModel.getUserId(), sharedViewModel.getSemester());
+                calendarView.removeDecorator(scheduleDecorator);
+                scheduleDecorator = new CalendarDecorator.Schedule(calendarViewModel.getMonthSchedule().getValue(), date.getMonth());
+                calendarView.addDecorator(scheduleDecorator);
                 adapter.notifyDataSetChanged();
             }
         });

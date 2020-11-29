@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:layout_margin="10dp"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/editTextReport"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/edit_text_multiline"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="신고 사유를 입력해주세요"
+        android:inputType="textPersonName"
+        android:padding="10dp" />
+</LinearLayout>

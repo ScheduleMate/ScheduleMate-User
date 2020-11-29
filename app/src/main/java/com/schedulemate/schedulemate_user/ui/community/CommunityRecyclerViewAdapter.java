@@ -22,9 +22,11 @@ class CommunityRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private List<Post> items;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     private Pattern pattern = Pattern.compile("([0-9]{4})-([0-9]{2})-([0-9]{2})\\s([0-9]{2}):([0-9]{2})");
+    private String classTitle;
 
-    public CommunityRecyclerViewAdapter(List<Post> items) {
+    public CommunityRecyclerViewAdapter(List<Post> items, String classTitle) {
         this.items = items;
+        this.classTitle = classTitle;
     }
 
     public void setItems(List<Post> items) {
@@ -95,7 +97,7 @@ class CommunityRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    CommunityFragmentDirections.ActionNavCommunityToPostFragment action = CommunityFragmentDirections.actionNavCommunityToPostFragment(post);
+                    CommunityFragmentDirections.ActionNavCommunityToPostFragment action = CommunityFragmentDirections.actionNavCommunityToPostFragment(post, textViewTitle.getText().toString());
                     Navigation.findNavController(v).navigate(action);
                 }
             });

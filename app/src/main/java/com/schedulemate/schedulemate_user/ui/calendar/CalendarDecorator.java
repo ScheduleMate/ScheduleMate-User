@@ -72,14 +72,16 @@ public class CalendarDecorator {
 
     static class Schedule implements DayViewDecorator{
         private HashMap<String, ArrayList> hashMap;
+        private int month;
 
-        public Schedule(HashMap<String, ArrayList> hashMap){
+        public Schedule(HashMap<String, ArrayList> hashMap, int month){
             this.hashMap = hashMap;
+            this.month = month;
         }
 
         @Override
         public boolean shouldDecorate(CalendarDay day) {
-            return hashMap.containsKey(String.valueOf(day.getDay()));
+            return hashMap.containsKey(String.valueOf(day.getDay())) && day.getMonth() == month;
         }
 
         @Override

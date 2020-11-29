@@ -39,7 +39,7 @@ public class RegisterSubject implements Serializable {
         return times;
     }
 
-    static public class Time{
+    static public class Time implements Serializable{
         private String day;
         private String start;
         private String end;

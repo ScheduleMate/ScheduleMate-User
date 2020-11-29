@@ -15,4 +15,5 @@
     <color name="hint">#5E5E5E</color>
     <color name="button1">#3498DB</color>
     <color name="button2">#4D5AE8</color>
+    <color name="alert">#FFD607</color>
 </resources>
