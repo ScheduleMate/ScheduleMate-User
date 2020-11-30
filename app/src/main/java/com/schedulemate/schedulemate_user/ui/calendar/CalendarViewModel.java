@@ -38,10 +38,10 @@ public class CalendarViewModel extends ViewModel {
     }
 
     public void setMonthSchedule(String month, String university, String uid, String semester){
+        hashMapDaySchedule.clear();
         database.getReference("calendar").child(user.getUid()).child(month).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                hashMapDaySchedule.clear();
                 for(DataSnapshot child : snapshot.getChildren()){
                     ArrayList<Schedule> schedules = new ArrayList<>();
                     for(DataSnapshot schedule : child.getChildren()){

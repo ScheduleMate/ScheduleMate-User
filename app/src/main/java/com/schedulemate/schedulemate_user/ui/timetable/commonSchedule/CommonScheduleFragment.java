@@ -126,16 +126,14 @@ public class CommonScheduleFragment extends Fragment {
             ((ImageButton)examView.findViewById(R.id.imageButtonReport)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    View view = getLayoutInflater().inflate(R.layout.report_dialog_layout, null);
                     android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                    builder.setTitle("일정 신고").setMessage("이 일정을 신고하시겠습니까?").setView(view).setPositiveButton("신고", new DialogInterface.OnClickListener() {
+                    builder.setTitle("일정 신고").setMessage("이 일정을 신고하시겠습니까?").setPositiveButton("신고", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             HashMap<String, String> info = new HashMap<>();
                             info.put("classKey", classInfo.getClassId());
                             info.put("classTitle", classInfo.getSubjectTitle());
                             info.put("declareTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
-                            info.put("reason", ((EditText)view.findViewById(R.id.editTextReport)).getText().toString());
                             info.put("registrant", classInfo.getMidExam().getRegistrant());
                             info.put("semester", timetableViewModel.getSemester());
 

@@ -1,5 +1,6 @@
 package com.schedulemate.schedulemate_user.ui.community;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ class CommunityRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public CommunityRecyclerViewAdapter(List<Post> items, String classTitle) {
         this.items = items;
         this.classTitle = classTitle;
+        Log.d("classTitle", classTitle);
     }
 
     public void setItems(List<Post> items) {
@@ -37,7 +39,7 @@ class CommunityRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public CommunityRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.community_fragment__recycler_view_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
+        ViewHolder viewHolder = new ViewHolder(view, classTitle);
         return viewHolder;
     }
 
@@ -86,7 +88,7 @@ class CommunityRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         public final TextView textViewTime;
         public Post post;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView, String classTitle) {
             super(itemView);
             this.view = itemView;
             this.textViewTitle = itemView.findViewById(R.id.textViewTitle);
@@ -97,7 +99,7 @@ class CommunityRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    CommunityFragmentDirections.ActionNavCommunityToPostFragment action = CommunityFragmentDirections.actionNavCommunityToPostFragment(post, textViewTitle.getText().toString());
+                    CommunityFragmentDirections.ActionNavCommunityToPostFragment action = CommunityFragmentDirections.actionNavCommunityToPostFragment(post, classTitle);
                     Navigation.findNavController(v).navigate(action);
                 }
             });

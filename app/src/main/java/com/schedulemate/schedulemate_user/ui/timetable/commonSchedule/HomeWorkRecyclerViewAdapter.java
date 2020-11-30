@@ -75,16 +75,14 @@ class HomeWorkRecyclerViewAdapter extends RecyclerView.Adapter<HomeWorkRecyclerV
         ((ImageButton)holder.view.findViewById(R.id.imageButtonReport)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View view = ((LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.report_dialog_layout, null);
                 android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
-                builder.setTitle("일정 신고").setMessage("이 일정을 신고하시겠습니까?").setView(view).setPositiveButton("신고", new DialogInterface.OnClickListener() {
+                builder.setTitle("일정 신고").setMessage("이 일정을 신고하시겠습니까?").setPositiveButton("신고", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         HashMap<String, String> info = new HashMap<>();
                         info.put("classKey", classId);
                         info.put("classTitle", subjectName);
                         info.put("declareTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
-                        info.put("reason", ((EditText)view.findViewById(R.id.editTextReport)).getText().toString());
                         info.put("registrant", items.get(position).getRegistrant());
                         info.put("semester", semester);
 

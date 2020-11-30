@@ -175,7 +175,7 @@ public class PostFragment extends Fragment {
                         info.put("content", post.getContent());
                         info.put("time", post.getTime());
                         info.put("title", post.getTitle());
-                        info.put("title", classTitle);
+                        info.put("classTitle", classTitle);
                         info.put("writer", post.getWriter());
                         info.put("writerNickName", post.getWriterNickName());
                         info.put("reason", ((EditText)view.findViewById(R.id.editTextReport)).getText().toString());

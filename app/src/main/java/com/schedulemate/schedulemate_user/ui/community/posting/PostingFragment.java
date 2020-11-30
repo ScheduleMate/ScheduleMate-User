@@ -44,6 +44,7 @@ public class PostingFragment extends Fragment {
         communityViewModel = new ViewModelProvider(requireActivity()).get(CommunityViewModel.class);
 
         Post post = PostingFragmentArgs.fromBundle(getArguments()).getPost();
+        classTitle = PostingFragmentArgs.fromBundle(getArguments()).getClassTitle();
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_posting, container, false);

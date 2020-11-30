@@ -28,15 +28,15 @@ import java.util.List;
 
 class PostRecyclerViewAdapter extends RecyclerView.Adapter<PostRecyclerViewAdapter.ViewHolder> {
     private List<Comment> items;
-    private String subjectId;
+    private String subjectName;
     private String classId;
     private String postId;
     private Context context;
     private User user;
 
-    public PostRecyclerViewAdapter(List<Comment> items, String classId, String postId, Context context, User user, String subjectId) {
+    public PostRecyclerViewAdapter(List<Comment> items, String classId, String postId, Context context, User user, String subjectName) {
         this.items = items;
-        this.subjectId = subjectId;
+        this.subjectName = subjectName;
         this.classId = classId;
         this.postId = postId;
         this.context = context;
@@ -96,7 +96,7 @@ class PostRecyclerViewAdapter extends RecyclerView.Adapter<PostRecyclerViewAdapt
                         HashMap<String, String> info = new HashMap<>();
                         //info.put("class", className);
                         info.put("classKey", classId);
-                        info.put("classTitle", subjectId);
+                        info.put("classTitle", subjectName);
                         info.put("communityKey", postId);
                         info.put("reason", ((EditText)view.findViewById(R.id.editTextReport)).getText().toString());
                         info.put("time", items.get(position).getTime());
