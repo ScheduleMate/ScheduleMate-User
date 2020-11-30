@@ -53,7 +53,6 @@ public class CommunityFragment extends Fragment {
         if(classTitle != null && communityViewModel.getBoardMap().getValue().containsValue(classTitle)){
             adapter = new CommunityRecyclerViewAdapter(communityViewModel.getPostList().getValue(), classTitle);
             recyclerViewPost.setAdapter(adapter);
-            Log.d("classTitleAtStart", classTitle);
         }
 
         communityViewModel.setBoardMap(sharedViewModel.getUniversity(), sharedViewModel.getSemester());
@@ -66,7 +65,6 @@ public class CommunityFragment extends Fragment {
                     if(adapter == null){
                         adapter = new CommunityRecyclerViewAdapter(communityViewModel.getPostList().getValue(), classTitle);
                         recyclerViewPost.setAdapter(adapter);
-                        Log.d("classTitleAtClassId", classTitle);
                     }
                 }
             }
@@ -81,7 +79,6 @@ public class CommunityFragment extends Fragment {
                     if(adapter == null){
                         adapter = new CommunityRecyclerViewAdapter(communityViewModel.getPostList().getValue(), classTitle);
                         recyclerViewPost.setAdapter(adapter);
-                        Log.d("classTitleAtBoardMap", classTitle);
                     }
                 }
             }
@@ -92,8 +89,6 @@ public class CommunityFragment extends Fragment {
             public void onChanged(List<Post> list) {
                 if(adapter != null) {
                     adapter.setItems(list, classTitle);
-
-                    Log.d("classTitleAtPostList", classTitle);
                     adapter.notifyDataSetChanged();
                 }
             }
