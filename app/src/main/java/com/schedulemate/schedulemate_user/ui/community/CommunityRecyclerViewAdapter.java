@@ -30,8 +30,9 @@ class CommunityRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         this.classTitle = classTitle;
     }
 
-    public void setItems(List<Post> items) {
+    public void setItems(List<Post> items, String classTitle) {
         this.items = items;
+        this.classTitle = classTitle;
     }
 
     @NonNull

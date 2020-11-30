@@ -48,6 +48,14 @@ public class CommunityFragment extends Fragment {
 
         textViewTitle = root.findViewById(R.id.textViewTitle);
 
+        RecyclerView recyclerViewPost = root.findViewById(R.id.recyclerViewPost);
+        recyclerViewPost.setLayoutManager(new LinearLayoutManager(getContext()));
+        if(classTitle != null && communityViewModel.getBoardMap().getValue().containsValue(classTitle)){
+            adapter = new CommunityRecyclerViewAdapter(communityViewModel.getPostList().getValue(), classTitle);
+            recyclerViewPost.setAdapter(adapter);
+            Log.d("classTitleAtStart", classTitle);
+        }
+
         communityViewModel.setBoardMap(sharedViewModel.getUniversity(), sharedViewModel.getSemester());
         communityViewModel.getClassId().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -55,12 +63,14 @@ public class CommunityFragment extends Fragment {
                 if(communityViewModel.getBoardMap().getValue().containsKey(s)) {
                     textViewTitle.setText(communityViewModel.getBoardMap().getValue().get(s).toString());
                     classTitle = communityViewModel.getBoardMap().getValue().get(s).toString();
+                    if(adapter == null){
+                        adapter = new CommunityRecyclerViewAdapter(communityViewModel.getPostList().getValue(), classTitle);
+                        recyclerViewPost.setAdapter(adapter);
+                        Log.d("classTitleAtClassId", classTitle);
+                    }
                 }
             }
         });
-
-        RecyclerView recyclerViewPost = root.findViewById(R.id.recyclerViewPost);
-        recyclerViewPost.setLayoutManager(new LinearLayoutManager(getContext()));
 
         communityViewModel.getBoardMap().observe(getViewLifecycleOwner(), new Observer<HashMap>() {
             @Override
@@ -68,8 +78,11 @@ public class CommunityFragment extends Fragment {
                 if(hashMap.containsKey(communityViewModel.getClassId().getValue())) {
                     textViewTitle.setText(hashMap.get(communityViewModel.getClassId().getValue()).toString());
                     classTitle = hashMap.get(communityViewModel.getClassId().getValue()).toString();
-                    adapter = new CommunityRecyclerViewAdapter(communityViewModel.getPostList().getValue(), classTitle);
-                    recyclerViewPost.setAdapter(adapter);
+                    if(adapter == null){
+                        adapter = new CommunityRecyclerViewAdapter(communityViewModel.getPostList().getValue(), classTitle);
+                        recyclerViewPost.setAdapter(adapter);
+                        Log.d("classTitleAtBoardMap", classTitle);
+                    }
                 }
             }
         });
@@ -78,7 +91,9 @@ public class CommunityFragment extends Fragment {
             @Override
             public void onChanged(List<Post> list) {
                 if(adapter != null) {
-                    adapter.setItems(list);
+                    adapter.setItems(list, classTitle);
+
+                    Log.d("classTitleAtPostList", classTitle);
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -88,7 +103,7 @@ public class CommunityFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 CommunityFragmentDirections.ActionNavCommunityToPostingFragment action =
-                        CommunityFragmentDirections.actionNavCommunityToPostingFragment(communityViewModel.getClassId().getValue());
+                        CommunityFragmentDirections.actionNavCommunityToPostingFragment(classTitle);
                 Navigation.findNavController(v).navigate(action);
             }
         });
