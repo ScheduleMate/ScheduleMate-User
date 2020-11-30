@@ -28,7 +28,6 @@ class CommunityRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public CommunityRecyclerViewAdapter(List<Post> items, String classTitle) {
         this.items = items;
         this.classTitle = classTitle;
-        Log.d("classTitle", classTitle);
     }
 
     public void setItems(List<Post> items) {
